@@ -4,9 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -30,20 +31,27 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LabJetpackComposeAnimacionesTheme {
-                AnimateColorScreen()
+                AnimateSizeAndPositionScreen()
             }
         }
     }
 }
 
 @Composable
-fun AnimateColorScreen() {
-    var isBlue by remember { mutableStateOf(true) }
+fun AnimateSizeAndPositionScreen() {
+    // Estado para alternar entre dos posiciones y tamaños
+    var isExpanded by remember { mutableStateOf(false) }
 
-    val animatedColor by animateColorAsState(
-        targetValue = if (isBlue) Color(0xFF2196F3) else Color(0xFF4CAF50), // Azul y Verde
-        animationSpec = tween(durationMillis = 1000),
-        label = "ColorAnimation"
+    val animatedSize by animateDpAsState(
+        targetValue = if (isExpanded) 240.dp else 120.dp,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = 200f),
+        label = "SizeAnimation"
+    )
+
+    val animatedOffsetY by animateDpAsState(
+        targetValue = if (isExpanded) (-60).dp else 0.dp,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = 200f),
+        label = "OffsetAnimation"
     )
 
     Surface(
@@ -57,32 +65,34 @@ fun AnimateColorScreen() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Box(
                 modifier = Modifier
-                    .size(200.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(animatedColor),
+                    .size(animatedSize)
+                    .offset(y = animatedOffsetY)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color(0xFFFF9800)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (isBlue) "Color Azul" else "Color Verde",
+                    text = if (isExpanded) "Expandido" else "Normal",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
             Button(
-                onClick = { isBlue = !isBlue },
+                onClick = { isExpanded = !isExpanded },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF673AB7)
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "Cambiar Color",
+                    text = if (isExpanded) "Restaurar Posición" else "Mover y Escalar",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
