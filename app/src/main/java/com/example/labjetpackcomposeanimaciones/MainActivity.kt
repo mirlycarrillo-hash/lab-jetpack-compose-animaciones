@@ -4,11 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,15 +30,21 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LabJetpackComposeAnimacionesTheme {
-                AnimatedVisibilityScreen()
+                AnimateColorScreen()
             }
         }
     }
 }
 
 @Composable
-fun AnimatedVisibilityScreen() {
-    var isVisible by remember { mutableStateOf(false) }
+fun AnimateColorScreen() {
+    var isBlue by remember { mutableStateOf(true) }
+
+    val animatedColor by animateColorAsState(
+        targetValue = if (isBlue) Color(0xFF2196F3) else Color(0xFF4CAF50), // Azul y Verde
+        animationSpec = tween(durationMillis = 1000),
+        label = "ColorAnimation"
+    )
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -49,47 +52,42 @@ fun AnimatedVisibilityScreen() {
     ) {
         Column(
             modifier = Modifier
+                .flexExpand() // o .fillMaxSize()
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = { isVisible = !isVisible },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF9C27B0)
-                ),
-                shape = RoundedCornerShape(12.dp)
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(animatedColor),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (isVisible) "Ocultar Cuadro" else "Mostrar Cuadro",
-                    fontSize = 16.sp,
+                    text = if (isBlue) "Color Azul" else "Color Verde",
+                    color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    fontSize = 16.sp
                 )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
-                exit = fadeOut() + slideOutVertically(targetOffsetY = { -it })
+            Button(
+                onClick = { isBlue = !isBlue },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF673AB7)
+                ),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFFE91E63)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "¡Hola con Animación!",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                }
+                Text(
+                    text = "Cambiar Color",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     }
