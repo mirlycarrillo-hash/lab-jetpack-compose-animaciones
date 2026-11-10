@@ -52,7 +52,6 @@ fun AnimateColorScreen() {
     ) {
         Column(
             modifier = Modifier
-                .flexExpand() // o .fillMaxSize()
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
